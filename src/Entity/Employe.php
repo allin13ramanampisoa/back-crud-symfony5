@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\EmployeRepository;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ApiResource()
  * @ORM\Entity(repositoryClass=EmployeRepository::class)
  */
 class Employe
@@ -41,6 +43,15 @@ class Employe
      * @ORM\Column(type="string", length=100)
      */
     private $diplome;
+
+    // ------------- RELATION --------------
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Experience", mappedBy="employe")
+     */
+    protected $experience;
+
+    // ------------- //// RELATION //// --------------
 
     public function getId(): ?int
     {
@@ -103,6 +114,28 @@ class Employe
     public function setDiplome(string $diplome): self
     {
         $this->diplome = $diplome;
+
+        return $this;
+    }
+
+    public function getExperience(): ?Experience
+    {
+        return $this->experience;
+    }
+
+    public function setExperience(?Experience $experience): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($experience === null && $this->experience !== null) {
+            $this->experience->setEmploye(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($experience !== null && $experience->getEmploye() !== $this) {
+            $experience->setEmploye($this);
+        }
+
+        $this->experience = $experience;
 
         return $this;
     }
